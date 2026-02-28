@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>QQ音乐歌单解析</title>
+    <style>
+        body {
+            font-family: Arial;
+            max-width: 800px;
+            margin: 40px auto;
+        }
+        input {
+            width: 500px;
+            padding: 8px;
+        }
+        button {
+            padding: 8px 15px;
+        }
+        .song {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+
+<h1>🎵 QQ音乐歌单解析</h1>
+
+<input type="text" id="playlistUrl" placeholder="输入QQ音乐歌单链接">
+<button onclick="fetchList()">解析</button>
+
+<h2 id="title"></h2>
+<div id="result"></div>
+
+<script>
+async function fetchList() {
+    const url = document.getElementById('playlistUrl').value;
+    const res = await fetch(`/api/playlist?url=${encodeURIComponent(url)}`);
+    const data = await res.json();
+
+    if (data.error) {
+        alert(data.error);
+        return;
+    }
+
+    document.getElementById('title').innerText =
+        `${data.name}（共 ${data.songCount} 首）`;
+
+    const resultDiv = document.getElementById('result');
+    resultDiv.innerHTML = '';
+
+    data.songs.forEach(song => {
+        const div = document.createElement('div');
+        div.className = 'song';
+        div.innerText = `${song.singer} - ${song.name}`;
+        resultDiv.appendChild(div);
+    });
+}
+</script>
+
+</body>
+</html>
