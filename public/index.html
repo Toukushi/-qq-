@@ -15,10 +15,15 @@
         }
         button {
             padding: 8px 15px;
+            margin-left: 5px;
         }
         .song {
-            padding: 8px;
-            border-bottom: 1px solid #ddd;
+            padding: 6px 0;
+            border-bottom: 1px solid #eee;
+        }
+        #copyBtn {
+            margin-top: 15px;
+            display: none;
         }
     </style>
 </head>
@@ -28,11 +33,14 @@
 
 <input type="text" id="playlistUrl" placeholder="输入QQ音乐歌单链接">
 <button onclick="fetchList()">解析</button>
+<button id="copyBtn" onclick="copySongs()">一键复制歌曲列表</button>
 
 <h2 id="title"></h2>
 <div id="result"></div>
 
 <script>
+let currentSongText = "";
+
 async function fetchList() {
     const url = document.getElementById('playlistUrl').value;
     const res = await fetch(`/api/playlist?url=${encodeURIComponent(url)}`);
@@ -49,12 +57,30 @@ async function fetchList() {
     const resultDiv = document.getElementById('result');
     resultDiv.innerHTML = '';
 
+    currentSongText = "";
+
     data.songs.forEach(song => {
+        const line = `${song.singer} - ${song.name}`;
+        currentSongText += line + "\n";
+
         const div = document.createElement('div');
         div.className = 'song';
-        div.innerText = `${song.singer} - ${song.name}`;
+        div.innerText = line;
         resultDiv.appendChild(div);
     });
+
+    // 显示复制按钮
+    document.getElementById('copyBtn').style.display = "inline-block";
+}
+
+function copySongs() {
+    navigator.clipboard.writeText(currentSongText)
+        .then(() => {
+            alert("已复制到剪贴板！");
+        })
+        .catch(() => {
+            alert("复制失败，请手动复制。");
+        });
 }
 </script>
 
